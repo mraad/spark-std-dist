@@ -85,7 +85,7 @@ class ImportStdPolygonTool(object):
         if arcpy.Exists(fc):
             arcpy.management.Delete(fc)
 
-        sp_ref = arcpy.SpatialReference(4326)
+        sp_ref = arcpy.SpatialReference(3857)
         arcpy.management.CreateFeatureclass(ws, name, "POLYGON",
                                             spatial_reference=sp_ref,
                                             has_m="DISABLED",
@@ -162,7 +162,7 @@ class ImportDirPolygonTool(object):
             direction="Input",
             datatype="GPString",
             parameterType="Required")
-        paramPath.value = "Z:\Share\ellipse-res.txt"
+        paramPath.value = "Z:/Share/dirdist.txt"
 
         return [paramFC, paramName, paramHost, paramUser, paramPath]
 
@@ -192,7 +192,7 @@ class ImportDirPolygonTool(object):
         if arcpy.Exists(fc):
             arcpy.management.Delete(fc)
 
-        sp_ref = arcpy.SpatialReference(4326)
+        sp_ref = arcpy.SpatialReference(3857)
         arcpy.management.CreateFeatureclass(ws, name, "POLYGON",
                                             spatial_reference=sp_ref,
                                             has_m="DISABLED",
