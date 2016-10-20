@@ -10,7 +10,9 @@ import scala.math._
   */
 object ScanDist {
   def apply(
-             iter: Iterable[(Double, Double)]
+             iter: Iterable[(Double, Double)],
+             epsilon: Double,
+             minPoints: Double
            ): Seq[StdDist] = {
 
     val (xarr, yarr) = iter
@@ -25,9 +27,9 @@ object ScanDist {
     val matrix = new DenseMatrix[Double](xarr.size, 2, (xarr ++ yarr).toArray)
 
     val dbScan = new GDBSCAN(
-      DBSCAN.getNeighbours(epsilon = 1.0,
+      DBSCAN.getNeighbours(epsilon = epsilon,
         distance = Kmeans.euclideanDistance),
-      DBSCAN.isCorePoint(minPoints = 3))
+      DBSCAN.isCorePoint(minPoints = minPoints))
 
     val clusters = dbScan cluster matrix
     clusters.map(cluster => {

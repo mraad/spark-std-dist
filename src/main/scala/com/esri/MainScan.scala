@@ -15,6 +15,7 @@ object MainScan extends App with Logging {
   val conf = AppProperties.loadProperties(filename)
     .registerKryoClasses(Array(
       classOf[OnlineVar],
+      classOf[OnlineMu],
       classOf[StdDist]
     ))
 
@@ -22,13 +23,15 @@ object MainScan extends App with Logging {
   try {
     val inputPath = conf.get("input.path", "/tmp/points.csv")
     val outputPath = conf.get("output.path", "/tmp/tmp")
+    val minPoints = conf.getInt("min.points", 3)
+    val epsilon = conf.getDouble("distance.epsilon", 300.0) // meters
     sc.textFile(inputPath)
       .flatMap(line => {
         try {
           val splits = line.split(',')
           val k = splits(0)
-          val x = splits(1).toDouble
-          val y = splits(2).toDouble
+          val x = splits(1).toDouble.toMercatorX
+          val y = splits(2).toDouble.toMercatorY
           Some(k -> (x, y))
         }
         catch {
@@ -36,7 +39,7 @@ object MainScan extends App with Logging {
         }
       })
       .groupByKey()
-      .flatMapValues(ScanDist(_))
+      .flatMapValues(ScanDist(_, epsilon, minPoints))
       .map {
         case (caseId, stdDist) => {
           val wkt = (for (a <- 0 to 360 by 10) yield {

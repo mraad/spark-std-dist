@@ -5,7 +5,7 @@ import org.apache.spark.{Logging, SparkContext}
 import scala.math._
 
 
-object Main extends App with Logging {
+object MainStd extends App with Logging {
 
   val filename = args.length match {
     case 1 => args.head
@@ -20,7 +20,7 @@ object Main extends App with Logging {
 
   val sc = new SparkContext(conf)
   try {
-    val inputPath = conf.get("input.path", "/Users/mraad_admin/Share/points.csv")
+    val inputPath = conf.get("input.path", "/tmp/points.csv")
     val outputPath = conf.get("output.path", "/tmp/tmp")
     sc.textFile(inputPath)
       .flatMap(line => {
@@ -29,7 +29,7 @@ object Main extends App with Logging {
           val k = splits(0)
           val x = splits(1).toDouble.toMercatorX
           val y = splits(2).toDouble.toMercatorY
-          Some(k ->(x, y))
+          Some(k -> (x, y))
         }
         catch {
           case t: Throwable => None
@@ -45,7 +45,7 @@ object Main extends App with Logging {
             val s = stdDist.my + stdDist.sd * sin(d)
             s"$c $s"
           }).mkString("POLYGON((", ",", "))")
-          s"${stdDist.mx}\t${stdDist.my}\t$caseId\t${stdDist.sd}\t$wkt"
+          s"$caseId\t${stdDist.mx}\t${stdDist.my}\t${stdDist.sd}\t$wkt"
         }
       }
       .saveAsTextFile(outputPath)

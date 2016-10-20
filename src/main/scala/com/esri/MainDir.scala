@@ -19,17 +19,17 @@ object MainDir extends App with Logging {
 
   val sc = new SparkContext(conf)
   try {
-    val inputPath = conf.get("input.path", "src/test/resources/ellipse-data.csv")
+    val inputPath = conf.get("input.path", "/tmp/points.csv")
     val outputPath = conf.get("output.path", "/tmp/tmp")
-    val numPoints = conf.getInt("ellipse.points", 100)
     val minPoints = conf.getInt("min.points", 1)
+    val numPoints = conf.getInt("ellipse.points", 100)
     sc.textFile(inputPath)
       .flatMap(line => {
         try {
           val splits = line.split(',')
           val k = splits(0)
-          val x = splits(1).toDouble
-          val y = splits(2).toDouble
+          val x = splits(1).toDouble.toMercatorX
+          val y = splits(2).toDouble.toMercatorY
           Some(k -> (x, y))
         }
         catch {
