@@ -1,8 +1,32 @@
 package com.esri
 
+import scala.collection.mutable.ArrayBuffer
 import scala.math._
 
-case class DirDist(mx: Double, my: Double, sx: Double, sy: Double, degrees: Double)
+case class DirDist(mx: Double, my: Double, sx: Double, sy: Double, heading: Double) {
+
+  def generatePoints(nPoint: Int): Seq[(Double, Double)] = {
+    val arr = new ArrayBuffer[(Double, Double)]()
+    var t = 0.0
+    val dt = 1.0 / nPoint
+
+    val alpha = (90 - heading).toRadians
+    val cosA = math.cos(alpha)
+    val sinA = math.sin(alpha)
+    val maj = sx max sy
+    val min = sx min sy
+    for (i <- 0 to nPoint) {
+      val r = t * 2.0 * math.Pi
+      val x = maj * math.cos(r)
+      val y = min * math.sin(r)
+      val rx = x * cosA - y * sinA
+      val ry = x * sinA + y * cosA
+      arr.append((mx + rx, my + ry))
+      t += dt
+    }
+    arr
+  }
+}
 
 object DirDist extends Serializable {
   def apply(iter: Iterable[(Double, Double)]) = {

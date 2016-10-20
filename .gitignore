@@ -1,7 +1,7 @@
+.idea/
+target/
 *.class
 *.log
 *.iml
-
-.idea/
-target/
-src/main/python/*.xml
+*.xml
+!pom.xml

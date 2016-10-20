@@ -45,7 +45,7 @@ class DirDistSpec extends FlatSpec with Matchers {
                 dirDist.mx shouldBe (mx +- eps)
                 dirDist.my shouldBe (my +- eps)
 
-                dirDist.degrees shouldBe (deg +- eps)
+                dirDist.heading shouldBe (deg +- eps)
 
                 dirDist.sx shouldBe (sx +- eps)
                 dirDist.sy shouldBe (sy +- eps)

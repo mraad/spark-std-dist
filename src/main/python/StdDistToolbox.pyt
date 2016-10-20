@@ -1,6 +1,5 @@
-import os
-
 import arcpy
+import os
 from hdfs import InsecureClient
 
 
@@ -8,7 +7,7 @@ class Toolbox(object):
     def __init__(self):
         self.label = "HDFS Std Tools"
         self.alias = "HDFS Std Tools"
-        self.tools = [ImportStdPolygonTool, ImportStdPointTool, ImportPointTool]
+        self.tools = [ImportStdPolygonTool, ImportDirPolygonTool, ImportStdPointTool, ImportPointTool]
 
 
 class ImportStdPolygonTool(object):
@@ -113,6 +112,118 @@ class ImportStdPolygonTool(object):
                             std_dist = float(t[3])
                             wkt = t[4]
                             cursor.insertRow((wkt, case_id, center_x, center_y, std_dist))
+            arcpy.ResetProgressor()
+        parameters[0].value = fc
+
+
+class ImportDirPolygonTool(object):
+    def __init__(self):
+        self.label = "Import Dir Dist Polygon"
+        self.description = "Import Dir Dist Polygon"
+        self.canRunInBackground = True
+
+    def getParameterInfo(self):
+        paramFC = arcpy.Parameter(
+            name="out_fc",
+            displayName="out_fc",
+            direction="Output",
+            datatype="Feature Layer",
+            parameterType="Derived")
+        paramFC.symbology = os.path.join(os.path.dirname(__file__), "DirDist.lyr")
+
+        paramName = arcpy.Parameter(
+            name="in_name",
+            displayName="Name",
+            direction="Input",
+            datatype="GPString",
+            parameterType="Required")
+        paramName.value = "DirDistPolygon"
+
+        paramHost = arcpy.Parameter(
+            name="in_host",
+            displayName="HDFS Host",
+            direction="Input",
+            datatype="GPString",
+            parameterType="Required")
+        paramHost.value = "quickstart"
+
+        paramUser = arcpy.Parameter(
+            name="in_user",
+            displayName="User name",
+            direction="Input",
+            datatype="GPString",
+            parameterType="Required")
+        paramUser.value = "root"
+
+        paramPath = arcpy.Parameter(
+            name="in_path",
+            displayName="HDFS Path",
+            direction="Input",
+            datatype="GPString",
+            parameterType="Required")
+        paramPath.value = "Z:\Share\ellipse-res.txt"
+
+        return [paramFC, paramName, paramHost, paramUser, paramPath]
+
+    def isLicensed(self):
+        return True
+
+    def updateParameters(self, parameters):
+        return
+
+    def updateMessages(self, parameters):
+        return
+
+    def execute(self, parameters, messages):
+        name = parameters[1].value
+        host = parameters[2].value
+        user = parameters[3].value
+        path = parameters[4].value
+
+        in_memory = True
+        if in_memory:
+            ws = "in_memory"
+            fc = ws + "/" + name
+        else:
+            fc = os.path.join(arcpy.env.scratchGDB, name)
+            ws = os.path.dirname(fc)
+
+        if arcpy.Exists(fc):
+            arcpy.management.Delete(fc)
+
+        sp_ref = arcpy.SpatialReference(4326)
+        arcpy.management.CreateFeatureclass(ws, name, "POLYGON",
+                                            spatial_reference=sp_ref,
+                                            has_m="DISABLED",
+                                            has_z="DISABLED")
+        arcpy.management.AddField(fc, "CASE_ID", "TEXT")
+        arcpy.management.AddField(fc, "CenterX", "FLOAT")
+        arcpy.management.AddField(fc, "CenterY", "FLOAT")
+        arcpy.management.AddField(fc, "XStdDist", "FLOAT")
+        arcpy.management.AddField(fc, "YStdDist", "FLOAT")
+        arcpy.management.AddField(fc, "Rotation", "FLOAT")
+
+        with arcpy.da.InsertCursor(fc, ["SHAPE@WKT", "CASE_ID", "CenterX", "CenterY", "XStdDist", "YStdDist",
+                                        "Rotation"]) as cursor:
+            # client = InsecureClient("http://{}:50070".format(host), user=user)
+            # parts = client.parts(path)
+            # arcpy.SetProgressor("step", "Importing...", 0, len(parts), 1)
+            # for part in parts:
+            #    arcpy.SetProgressorLabel("Importing {0}...".format(part))
+            #    arcpy.SetProgressorPosition()
+            #    with client.read("{}/{}".format(path, part), encoding="utf-8", delimiter="\n") as reader:
+            with open(path, "r") as reader:
+                for line in reader:
+                    t = line.split("\t")
+                    if len(t) > 6:
+                        case_id = t[0]
+                        center_x = float(t[1])
+                        center_y = float(t[2])
+                        angle = float(t[3])
+                        signa_x = float(t[4])
+                        signa_y = float(t[5])
+                        wkt = t[6]
+                        cursor.insertRow((wkt, case_id, center_x, center_y, signa_x, signa_y, angle))
             arcpy.ResetProgressor()
         parameters[0].value = fc
 

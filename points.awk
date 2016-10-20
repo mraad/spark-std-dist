@@ -7,7 +7,7 @@ BEGIN{
   DX = XMAX - XMIN
   DY = YMAX - YMIN
   srand()
-  for(I=0;I<10000;I++){
+  for(I=0;I<1000;I++){
     XM = XMIN + rand() * DX
     YM = YMIN + rand() * DY
     GID = "G" + I

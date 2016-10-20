@@ -4,7 +4,7 @@
 
     <groupId>com.esri</groupId>
     <artifactId>spark-std-dist</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -73,6 +73,12 @@
             <version>0.1.0</version>
         </dependency>
         -->
+        <!-- http://mvnrepository.com/artifact/org.scalaz/scalaz-core_2.10 -->
+        <dependency>
+            <groupId>org.scalaz</groupId>
+            <artifactId>scalaz-core_${scala.compact.version}</artifactId>
+            <version>7.2.3</version>
+        </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_${scala.compact.version}</artifactId>
@@ -186,7 +192,7 @@
                                 </transformer>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.esri.Main</mainClass>
+                                    <mainClass>com.esri.MainDir</mainClass>
                                 </transformer>
                             </transformers>
                             <filters>

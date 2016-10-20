@@ -140,6 +140,11 @@ The toolbox consists of the following tools:
 - Implement weighted values
 - Implement a `reduceByKey` rather than a `groupByKey`
 - Implement a single pass for the computation of the sum of the difference between a point and the mean 
-- Implement Directional Distribution (partially done :-)
-- Make ArcPy draw the standard distance polygons and directional distribution ellipses
+- ~~Implement Directional Distribution (partially done :-)~~
+- ~~Make ArcPy draw the standard distance polygons and directional distribution ellipses~~
 - Implement StdDist as Python aggregated UDF for SparkSQL
+
+## References
+
+- <http://deepsense.io/fast-and-accurate-categorical-distribution-without-reshuffling-in-apache-spark/>
+- <http://homepage.cs.latrobe.edu.au/zhe/ZhenHeSparkRDDAPIExamples.html#aggregate>
