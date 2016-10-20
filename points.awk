@@ -7,11 +7,11 @@ BEGIN{
   DX = XMAX - XMIN
   DY = YMAX - YMIN
   srand()
-  for(I=0;I<1000;I++){
+  for(I=0;I<20;I++){
     XM = XMIN + rand() * DX
     YM = YMIN + rand() * DY
     GID = "G" + I
-    JMAX=5+int(10*rand())
+    JMAX=5+int(30*rand())
     for(J=0;J<JMAX;J++){
         AX = rand()
         BX = rand()

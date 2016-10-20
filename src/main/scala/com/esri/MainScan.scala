@@ -2,8 +2,10 @@ package com.esri
 
 import org.apache.spark.{Logging, SparkContext}
 
+import scala.math._
 
-object MainDir extends App with Logging {
+
+object MainScan extends App with Logging {
 
   val filename = args.length match {
     case 1 => args.head
@@ -13,16 +15,13 @@ object MainDir extends App with Logging {
   val conf = AppProperties.loadProperties(filename)
     .registerKryoClasses(Array(
       classOf[OnlineVar],
-      classOf[OnlineMu],
-      classOf[DirDist]
+      classOf[StdDist]
     ))
 
   val sc = new SparkContext(conf)
   try {
-    val inputPath = conf.get("input.path", "src/test/resources/ellipse-data.csv")
+    val inputPath = conf.get("input.path", "/tmp/points.csv")
     val outputPath = conf.get("output.path", "/tmp/tmp")
-    val numPoints = conf.getInt("ellipse.points", 100)
-    val minPoints = conf.getInt("min.points", 1)
     sc.textFile(inputPath)
       .flatMap(line => {
         try {
@@ -37,14 +36,16 @@ object MainDir extends App with Logging {
         }
       })
       .groupByKey()
-      .flatMapValues(DirDist(_, minPoints))
+      .flatMapValues(ScanDist(_))
       .map {
-        case (caseId, dirDist) => {
-          val wkt = dirDist.generatePoints(numPoints).map {
-            case (x, y) => s"$x $y"
-          }
-            .mkString("POLYGON((", ",", "))")
-          s"$caseId\t${dirDist.mx}\t${dirDist.my}\t${dirDist.heading}\t${dirDist.sx}\t${dirDist.sy}\t$wkt"
+        case (caseId, stdDist) => {
+          val wkt = (for (a <- 0 to 360 by 10) yield {
+            val d = a.toDouble.toRadians
+            val c = stdDist.mx + stdDist.sd * cos(d)
+            val s = stdDist.my + stdDist.sd * sin(d)
+            s"$c $s"
+          }).mkString("POLYGON((", ",", "))")
+          s"$caseId\t${stdDist.mx}\t${stdDist.my}\t${stdDist.sd}\t$wkt"
         }
       }
       .saveAsTextFile(outputPath)

@@ -4,13 +4,13 @@
 
     <groupId>com.esri</groupId>
     <artifactId>spark-std-dist</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.compact.version>2.10</scala.compact.version>
-        <scala.version>2.10.6</scala.version>
+        <scala.compact>2.10</scala.compact>
+        <scala.version>${scala.compact}.6</scala.version>
         <spark.version>1.5.0-cdh5.5.0</spark.version>
         <java.version>1.7</java.version>
     </properties>
@@ -42,7 +42,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_${scala.compact.version}</artifactId>
+            <artifactId>spark-core_${scala.compact}</artifactId>
             <version>${spark.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -74,20 +74,37 @@
         </dependency>
         -->
         <!-- http://mvnrepository.com/artifact/org.scalaz/scalaz-core_2.10 -->
+        <!--
+                <dependency>
+                    <groupId>org.scalaz</groupId>
+                    <artifactId>scalaz-core_${scala.compact}</artifactId>
+                    <version>7.2.3</version>
+                </dependency>
+        -->
         <dependency>
-            <groupId>org.scalaz</groupId>
-            <artifactId>scalaz-core_${scala.compact.version}</artifactId>
-            <version>7.2.3</version>
+            <groupId>org.scalanlp</groupId>
+            <artifactId>nak_${scala.compact}</artifactId>
+            <version>1.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-library</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-reflect</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${scala.compact.version}</artifactId>
+            <artifactId>scalatest_${scala.compact}</artifactId>
             <version>2.2.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.jsuereth</groupId>
-            <artifactId>scala-arm_${scala.compact.version}</artifactId>
+            <artifactId>scala-arm_${scala.compact}</artifactId>
             <version>1.4</version>
             <scope>test</scope>
         </dependency>
@@ -125,7 +142,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <scalaCompatVersion>${scala.compact.version}</scalaCompatVersion>
+                    <scalaCompatVersion>${scala.compact}</scalaCompatVersion>
                     <scalaVersion>${scala.version}</scalaVersion>
                     <recompileMode>incremental</recompileMode>
                     <useZincServer>false</useZincServer>
@@ -192,7 +209,7 @@
                                 </transformer>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.esri.MainDir</mainClass>
+                                    <mainClass>com.esri.MainScan</mainClass>
                                 </transformer>
                             </transformers>
                             <filters>

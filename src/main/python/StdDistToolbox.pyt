@@ -1,6 +1,5 @@
 import arcpy
 import os
-from hdfs import InsecureClient
 
 
 class Toolbox(object):
@@ -55,7 +54,8 @@ class ImportStdPolygonTool(object):
             direction="Input",
             datatype="GPString",
             parameterType="Required")
-        paramPath.value = "/user/root/std-dist"
+        # paramPath.value = "/user/root/std-dist"
+        paramPath.value = "Z:/Share/stddist.txt"
 
         return [paramFC, paramName, paramHost, paramUser, paramPath]
 
@@ -85,7 +85,7 @@ class ImportStdPolygonTool(object):
         if arcpy.Exists(fc):
             arcpy.management.Delete(fc)
 
-        sp_ref = arcpy.SpatialReference(3857)
+        sp_ref = arcpy.SpatialReference(4326)
         arcpy.management.CreateFeatureclass(ws, name, "POLYGON",
                                             spatial_reference=sp_ref,
                                             has_m="DISABLED",
@@ -96,22 +96,23 @@ class ImportStdPolygonTool(object):
         arcpy.management.AddField(fc, "STD_DIST", "FLOAT")
 
         with arcpy.da.InsertCursor(fc, ["SHAPE@WKT", "CASE_ID", "CENTER_X", "CENTER_Y", "STD_DIST"]) as cursor:
-            client = InsecureClient("http://{}:50070".format(host), user=user)
-            parts = client.parts(path)
-            arcpy.SetProgressor("step", "Importing...", 0, len(parts), 1)
-            for part in parts:
-                arcpy.SetProgressorLabel("Importing {0}...".format(part))
-                arcpy.SetProgressorPosition()
-                with client.read("{}/{}".format(path, part), encoding="utf-8", delimiter="\n") as reader:
-                    for line in reader:
-                        t = line.split("\t")
-                        if len(t) > 4:
-                            center_x = float(t[0])
-                            center_y = float(t[1])
-                            case_id = t[2]
-                            std_dist = float(t[3])
-                            wkt = t[4]
-                            cursor.insertRow((wkt, case_id, center_x, center_y, std_dist))
+            # client = InsecureClient("http://{}:50070".format(host), user=user)
+            # parts = client.parts(path)
+            # arcpy.SetProgressor("step", "Importing...", 0, len(parts), 1)
+            # for part in parts:
+            #    arcpy.SetProgressorLabel("Importing {0}...".format(part))
+            #    arcpy.SetProgressorPosition()
+            #    with client.read("{}/{}".format(path, part), encoding="utf-8", delimiter="\n") as reader:
+            with open(path, "r") as reader:
+                for line in reader:
+                    t = line.split("\t")
+                    if len(t) > 4:
+                        case_id = t[0]
+                        center_x = float(t[1])
+                        center_y = float(t[2])
+                        std_dist = float(t[3])
+                        wkt = t[4]
+                        cursor.insertRow((wkt, case_id, center_x, center_y, std_dist))
             arcpy.ResetProgressor()
         parameters[0].value = fc
 
@@ -311,21 +312,22 @@ class ImportStdPointTool(object):
         arcpy.management.AddField(fc, "STD_DIST", "FLOAT")
 
         with arcpy.da.InsertCursor(fc, ["SHAPE@XY", "CASE_ID", "STD_DIST"]) as cursor:
-            client = InsecureClient("http://{}:50070".format(host), user=user)
-            parts = client.parts(path)
-            arcpy.SetProgressor("step", "Importing...", 0, len(parts), 1)
-            for part in parts:
-                arcpy.SetProgressorLabel("Importing {0}...".format(part))
-                arcpy.SetProgressorPosition()
-                with client.read("{}/{}".format(path, part), encoding="utf-8", delimiter="\n") as reader:
-                    for line in reader:
-                        t = line.split("\t")
-                        if len(t) > 3:
-                            center_x = float(t[0])
-                            center_y = float(t[1])
-                            case_id = t[2]
-                            std_dist = float(t[3])
-                            cursor.insertRow(((center_x, center_y), case_id, std_dist))
+            # client = InsecureClient("http://{}:50070".format(host), user=user)
+            # parts = client.parts(path)
+            # arcpy.SetProgressor("step", "Importing...", 0, len(parts), 1)
+            # for part in parts:
+            #    arcpy.SetProgressorLabel("Importing {0}...".format(part))
+            #    arcpy.SetProgressorPosition()
+            #    with client.read("{}/{}".format(path, part), encoding="utf-8", delimiter="\n") as reader:
+            with open(path, "r") as reader:
+                for line in reader:
+                    t = line.split("\t")
+                    if len(t) > 3:
+                        case_id = t[0]
+                        center_x = float(t[1])
+                        center_y = float(t[2])
+                        std_dist = float(t[3])
+                        cursor.insertRow(((center_x, center_y), case_id, std_dist))
             arcpy.ResetProgressor()
         parameters[0].value = fc
 
@@ -374,7 +376,7 @@ class ImportPointTool(object):
             direction="Input",
             datatype="GPString",
             parameterType="Required")
-        paramPath.value = "/user/root/points.csv"
+        paramPath.value = "Z:/Share/points.csv"
 
         return [paramFC, paramName, paramHost, paramUser, paramPath]
 
@@ -412,23 +414,24 @@ class ImportPointTool(object):
         arcpy.management.AddField(fc, "CASE_ID", "TEXT")
 
         with arcpy.da.InsertCursor(fc, ["SHAPE@XY", "CASE_ID"]) as cursor:
-            client = InsecureClient("http://{}:50070".format(host), user=user)
-
-            status = client.status(path)
-            status_len = status['length']
-
-            arcpy.SetProgressor("step", "Importing...", 0, status_len, 1)
-
             pos = 0
-            with client.read(path, encoding="utf-8", delimiter="\n") as reader:
+            # client = InsecureClient("http://{}:50070".format(host), user=user)
+            # status = client.status(path)
+            # status_len = status['length']
+            # arcpy.SetProgressor("step", "Importing...", 0, status_len, 1)
+            # with client.read(path, encoding="utf-8", delimiter="\n") as reader:
+            with open(path, "r") as reader:
                 for line in reader:
                     pos += len(line)
-                    arcpy.SetProgressorPosition(pos)
+                    # arcpy.SetProgressorPosition(pos)
                     t = line.split(",")
                     if len(t) == 3:
-                        case_id = t[0]
-                        lon = float(t[1])
-                        lat = float(t[2])
-                        cursor.insertRow(((lon, lat), case_id))
+                        try:
+                            case_id = t[0]
+                            lon = float(t[1])
+                            lat = float(t[2])
+                            cursor.insertRow(((lon, lat), case_id))
+                        except:
+                            pass
             arcpy.ResetProgressor()
         parameters[0].value = fc
