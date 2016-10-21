@@ -4,16 +4,15 @@ import breeze.linalg.DenseMatrix
 import nak.cluster.{DBSCAN, GDBSCAN, Kmeans}
 
 import scala.collection.mutable.ArrayBuffer
-import scala.math._
 
 /**
   */
-object ScanDist {
+object ScanDir {
   def apply(
              iter: Iterable[(Double, Double)],
              epsilon: Double,
              minPoints: Int
-           ): Seq[StdDist] = {
+           ) = {
 
     val (xarr, yarr) = iter
       .foldLeft((new ArrayBuffer[Double](), new ArrayBuffer[Double]())) {
@@ -32,18 +31,14 @@ object ScanDist {
       DBSCAN.isCorePoint(minPoints = minPoints))
 
     val clusters = dbScan cluster matrix
-    clusters.map(cluster => {
-      val (ox, oy) = cluster.points.foldLeft((OnlineVar(), OnlineVar())) {
-        case ((ox, oy), point) => {
+    clusters.flatMap(cluster => {
+      val points = cluster
+        .points
+        .map(point => {
           val denseVector = point.value
-          ox += denseVector(0)
-          oy += denseVector(1)
-          (ox, oy)
-        }
-      }
-      val sd = sqrt(ox.variance + oy.variance)
-      StdDist(ox.mu, oy.mu, sd)
+          (denseVector(0), denseVector(1))
+        })
+      DirDist(points, minPoints)
     })
   }
-
 }

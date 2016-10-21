@@ -414,7 +414,7 @@ class ImportPointTool(object):
         arcpy.management.AddField(fc, "CASE_ID", "TEXT")
 
         with arcpy.da.InsertCursor(fc, ["SHAPE@XY", "CASE_ID"]) as cursor:
-            pos = 0
+            # pos = 0
             # client = InsecureClient("http://{}:50070".format(host), user=user)
             # status = client.status(path)
             # status_len = status['length']
@@ -422,7 +422,7 @@ class ImportPointTool(object):
             # with client.read(path, encoding="utf-8", delimiter="\n") as reader:
             with open(path, "r") as reader:
                 for line in reader:
-                    pos += len(line)
+                    # pos += len(line)
                     # arcpy.SetProgressorPosition(pos)
                     t = line.split(",")
                     if len(t) == 3:

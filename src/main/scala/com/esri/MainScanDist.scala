@@ -5,7 +5,7 @@ import org.apache.spark.{Logging, SparkContext}
 import scala.math._
 
 
-object MainScan extends App with Logging {
+object MainScanDist extends App with Logging {
 
   val filename = args.length match {
     case 1 => args.head
@@ -24,7 +24,7 @@ object MainScan extends App with Logging {
     val inputPath = conf.get("input.path", "/tmp/points.csv")
     val outputPath = conf.get("output.path", "/tmp/tmp")
     val minPoints = conf.getInt("min.points", 3)
-    val epsilon = conf.getDouble("distance.epsilon", 300.0) // meters
+    val epsilon = conf.getDouble("distance.meters", 300.0)
     sc.textFile(inputPath)
       .flatMap(line => {
         try {

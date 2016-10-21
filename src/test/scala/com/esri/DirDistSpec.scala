@@ -40,16 +40,20 @@ class DirDistSpec extends FlatSpec with Matchers {
             val gid = t(6)
             gidMap.get(gid) match {
               case Some(iter) => {
-                val dirDist = DirDist(iter)
+                val dirDistOpt = DirDist(iter, 1)
+                if (dirDistOpt.isEmpty) {
+                  fail("DirDist is empty")
+                } else {
+                  val dirDist = dirDistOpt.get
 
-                dirDist.mx shouldBe (mx +- eps)
-                dirDist.my shouldBe (my +- eps)
+                  dirDist.mx shouldBe (mx +- eps)
+                  dirDist.my shouldBe (my +- eps)
 
-                dirDist.heading shouldBe (deg +- eps)
+                  dirDist.heading shouldBe (deg +- eps)
 
-                dirDist.sx shouldBe (sx +- eps)
-                dirDist.sy shouldBe (sy +- eps)
-
+                  dirDist.sx shouldBe (sx +- eps)
+                  dirDist.sy shouldBe (sy +- eps)
+                }
               }
               case _ => fail(s"Cannot find dir-dist entry for $gid")
             }
