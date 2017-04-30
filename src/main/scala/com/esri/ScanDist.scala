@@ -17,10 +17,10 @@ object ScanDist {
 
     val (xarr, yarr) = iter
       .foldLeft((new ArrayBuffer[Double](), new ArrayBuffer[Double]())) {
-        case ((xarr, yarr), (x, y)) => {
-          xarr += x
-          yarr += y
-          (xarr, yarr)
+        case ((xarr_, yarr_), (x, y)) => {
+          xarr_ += x
+          yarr_ += y
+          (xarr_, yarr_)
         }
       }
 
